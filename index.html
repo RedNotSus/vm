@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hyperbeam Cloud Console</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="h-screen w-full flex flex-col">
+
+    <!-- Top Navigation Bar -->
+    <nav class="h-16 bg-zinc-950/80 backdrop-blur-md flex items-center justify-center px-6 sticky top-0 z-40">
+
+        <!-- Center Nav Tabs -->
+        <div class="flex items-center gap-1 bg-zinc-900/50 p-1 rounded-lg border border-zinc-800">
+            <a href="index.html" id="nav-home"
+                class="nav-link active border-blue-500/20 px-4 py-1.5 rounded-md text-sm font-medium text-zinc-400 hover:text-white transition-all flex items-center gap-2">
+                <i data-lucide="zap" class="w-4 h-4"></i>
+                Launchpad
+            </a>
+            <a href="instances.html" id="nav-dashboard"
+                class="nav-link px-4 py-1.5 rounded-md text-sm font-medium text-zinc-400 hover:text-white transition-all flex items-center gap-2">
+                <i data-lucide="server" class="w-4 h-4"></i>
+                Instances
+            </a>
+        </div>
+
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 relative overflow-hidden">
+
+        <!-- View: Home (Launchpad) -->
+        <section id="view-home" class="absolute inset-0 flex flex-col items-center justify-center p-6 fade-enter">
+            <div class="text-center max-w-2xl">
+
+                <h1 class="text-5xl font-bold mb-6 text-white tracking-tight">Virtual Browser <br /><span
+                        class="text-zinc-600">Infrastructure</span></h1>
+                <p class="text-zinc-400 text-lg mb-10 max-w-lg mx-auto leading-relaxed">
+                    Deploy ephemeral chromium instances on the edge. Low latency, fully isolated, and instantly
+                    available.
+                </p>
+
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+                    <!-- Added hover effects: scale, shadow-blue -->
+                    <button id="btn-deploy" onclick="actions.create()"
+                        class="group relative px-8 py-4 bg-white text-black font-semibold rounded-lg hover:bg-zinc-100 hover:scale-105 hover:shadow-2xl hover:shadow-blue-500/20 transition-all duration-300 active:scale-95 flex items-center gap-2 shadow-xl shadow-white/5">
+                        <i data-lucide="play" class="w-5 h-5 fill-current"></i>
+                        <span>Deploy Instance</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Overlay: Active Session -->
+    <div id="session-overlay"
+        class="fixed inset-0 z-50 bg-black hidden flex-col opacity-0 transition-opacity duration-700 ease-in-out">
+        <!-- Control Dock (Hover to show) -->
+        <div class="absolute top-4 left-1/2 -translate-x-1/2 glass-panel px-4 py-2 rounded-full flex items-center gap-4 shadow-2xl transition-all duration-300 opacity-0 hover:opacity-100 z-50"
+            id="control-dock">
+            <div class="flex items-center gap-2 pr-4 border-r border-zinc-700">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span class="text-xs font-mono text-zinc-400" id="overlay-id">--</span>
+            </div>
+            <button onclick="actions.disconnect()" class="text-zinc-400 hover:text-white transition-colors"
+                title="Disconnect (Background)">
+                <i data-lucide="minimize-2" class="w-4 h-4"></i>
+            </button>
+            <button onclick="actions.terminateCurrent()" class="text-red-400 hover:text-red-300 transition-colors"
+                title="Terminate Session">
+                <i data-lucide="power" class="w-4 h-4"></i>
+            </button>
+        </div>
+
+        <iframe id="vm-frame" class="w-full h-full border-none bg-zinc-950"
+            allow="clipboard-read; clipboard-write; microphone; camera; fullscreen"></iframe>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="fixed bottom-6 right-6 z-[60] flex flex-col gap-2 pointer-events-none"></div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

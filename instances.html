@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hyperbeam Cloud Console - Instances</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="h-screen w-full flex flex-col">
+
+    <!-- Top Navigation Bar -->
+    <nav class="h-16 bg-zinc-950/80 backdrop-blur-md flex items-center justify-center px-6 sticky top-0 z-40">
+
+        <!-- Center Nav Tabs -->
+        <div class="flex items-center gap-1 bg-zinc-900/50 p-1 rounded-lg border border-zinc-800">
+            <a href="index.html" id="nav-home"
+                class="nav-link px-4 py-1.5 rounded-md text-sm font-medium text-zinc-400 hover:text-white transition-all flex items-center gap-2">
+                <i data-lucide="zap" class="w-4 h-4"></i>
+                Launchpad
+            </a>
+            <a href="instances.html" id="nav-dashboard"
+                class="nav-link active border-blue-500/20 px-4 py-1.5 rounded-md text-sm font-medium text-zinc-400 hover:text-white transition-all flex items-center gap-2">
+                <i data-lucide="server" class="w-4 h-4"></i>
+                Instances
+            </a>
+        </div>
+
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 relative overflow-hidden">
+
+        <!-- View: Dashboard (Management) -->
+        <section id="view-dashboard" class="absolute inset-0 p-8 overflow-y-auto">
+            <div class="max-w-6xl mx-auto fade-enter">
+
+                <div class="flex items-center justify-between mb-8">
+                    <div>
+                        <h2 class="text-2xl font-bold text-white mb-1">Active Instances</h2>
+                        <p class="text-zinc-400 text-sm">Manage your running virtual machines.</p>
+                    </div>
+                    <button id="btn-refresh" onclick="actions.refresh(true)"
+                        class="p-2 bg-zinc-900 border border-zinc-800 rounded-lg text-zinc-400 hover:text-white transition-colors group"
+                        title="Refresh List">
+                        <i data-lucide="refresh-cw"
+                            class="w-4 h-4 group-active:rotate-180 transition-transform duration-300"></i>
+                    </button>
+                </div>
+
+                <!-- Stats Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                    <div class="glass-panel p-4 rounded-xl flex items-center justify-between">
+                        <div>
+                            <p class="text-zinc-500 text-xs font-medium uppercase tracking-wider">Running</p>
+                            <p class="text-2xl font-bold text-white mt-1" id="stat-count">0</p>
+                        </div>
+                        <i data-lucide="cpu" class="w-8 h-8 text-zinc-700"></i>
+                    </div>
+                    <div class="glass-panel p-4 rounded-xl flex items-center justify-between">
+                        <div>
+                            <p class="text-zinc-500 text-xs font-medium uppercase tracking-wider">Region</p>
+                            <p class="text-xl font-bold text-white mt-1">NA-East</p>
+                        </div>
+                        <i data-lucide="globe" class="w-8 h-8 text-zinc-700"></i>
+                    </div>
+                    <div class="glass-panel p-4 rounded-xl flex items-center justify-between">
+                        <div>
+                            <p class="text-zinc-500 text-xs font-medium uppercase tracking-wider">API Status</p>
+                            <p class="text-xl font-bold text-emerald-500 mt-1">Healthy</p>
+                        </div>
+                        <i data-lucide="activity" class="w-8 h-8 text-zinc-700"></i>
+                    </div>
+                </div>
+
+                <!-- Table -->
+                <div class="glass-panel rounded-xl overflow-hidden border border-zinc-800">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left">
+                            <thead>
+                                <tr
+                                    class="border-b border-zinc-800 bg-zinc-900/50 text-xs uppercase text-zinc-500 font-medium tracking-wider">
+                                    <th class="px-6 py-4">Status</th>
+                                    <th class="px-6 py-4">Session ID</th>
+                                    <th class="px-6 py-4">Uptime</th>
+                                    <th class="px-6 py-4">Profile</th>
+                                    <th class="px-6 py-4 text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="session-table-body" class="divide-y divide-zinc-800 text-sm text-zinc-300">
+                                <!-- Dynamic Rows -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="empty-state" class="hidden py-12 flex flex-col items-center justify-center text-zinc-500">
+                        <div class="w-16 h-16 bg-zinc-900 rounded-full flex items-center justify-center mb-4">
+                            <i data-lucide="box" class="w-8 h-8 opacity-50"></i>
+                        </div>
+                        <p>No active sessions found.</p>
+                        <button onclick="actions.create()"
+                            class="mt-4 text-blue-500 hover:text-blue-400 text-sm font-medium">Create one now</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Overlay: Active Session -->
+    <div id="session-overlay"
+        class="fixed inset-0 z-50 bg-black hidden flex-col opacity-0 transition-opacity duration-700 ease-in-out">
+        <!-- Control Dock (Hover to show) -->
+        <div class="absolute top-4 left-1/2 -translate-x-1/2 glass-panel px-4 py-2 rounded-full flex items-center gap-4 shadow-2xl transition-all duration-300 opacity-0 hover:opacity-100 z-50"
+            id="control-dock">
+            <div class="flex items-center gap-2 pr-4 border-r border-zinc-700">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span class="text-xs font-mono text-zinc-400" id="overlay-id">--</span>
+            </div>
+            <button onclick="actions.disconnect()" class="text-zinc-400 hover:text-white transition-colors"
+                title="Disconnect (Background)">
+                <i data-lucide="minimize-2" class="w-4 h-4"></i>
+            </button>
+            <button onclick="actions.terminateCurrent()" class="text-red-400 hover:text-red-300 transition-colors"
+                title="Terminate Session">
+                <i data-lucide="power" class="w-4 h-4"></i>
+            </button>
+        </div>
+
+        <iframe id="vm-frame" class="w-full h-full border-none bg-zinc-950"
+            allow="clipboard-read; clipboard-write; microphone; camera; fullscreen"></iframe>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="fixed bottom-6 right-6 z-[60] flex flex-col gap-2 pointer-events-none"></div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
