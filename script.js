@@ -1,5 +1,86 @@
 // --- CONFIGURATION ---
 const API_BASE = "https://api.ch3n.cc/api/hyperbeam";
+const AUTH_API = "https://db.55gms.com/api";
+
+// --- AUTHENTICATION ---
+const auth = {
+    init: () => {
+        const token = localStorage.getItem("hb_auth_token");
+        const username = localStorage.getItem("hb_username");
+
+        if (token && username === "rednotsus") {
+            auth.showApp();
+        } else {
+            auth.showLogin();
+        }
+    },
+    login: async (e) => {
+        e.preventDefault();
+        const btn = document.getElementById("btn-login");
+        const originalBtn = btn.innerHTML;
+        const errorMsg = document.getElementById("login-error");
+
+        errorMsg.classList.add("hidden");
+        btn.disabled = true;
+        btn.innerHTML = '<div class="loader border-zinc-900 border-l-transparent"></div>';
+
+        const usernameInput = document.getElementById("username");
+        const passwordInput = document.getElementById("password");
+        const username = usernameInput.value;
+        const password = passwordInput.value;
+
+        if (username !== "rednotsus") {
+             setTimeout(() => {
+                 errorMsg.innerText = "Access denied: Invalid username";
+                 errorMsg.classList.remove("hidden");
+                 btn.disabled = false;
+                 btn.innerHTML = originalBtn;
+             }, 500);
+             return;
+        }
+
+        try {
+            const res = await fetch(`${AUTH_API}/login`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ username, password })
+            });
+
+            const data = await res.json();
+
+            if (res.ok && data.success) {
+                if (data.username === "rednotsus") {
+                    localStorage.setItem("hb_auth_token", data.uuid);
+                    localStorage.setItem("hb_username", data.username);
+                    auth.showApp();
+                } else {
+                    throw new Error("Unauthorized user");
+                }
+            } else {
+                throw new Error(data.error || "Login failed");
+            }
+        } catch (err) {
+            errorMsg.innerText = err.message;
+            errorMsg.classList.remove("hidden");
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = originalBtn;
+        }
+    },
+    logout: () => {
+        localStorage.removeItem("hb_auth_token");
+        localStorage.removeItem("hb_username");
+        window.location.reload();
+    },
+    showApp: () => {
+        document.getElementById("login-view").classList.add("hidden");
+        document.getElementById("app-view").classList.remove("hidden");
+    },
+    showLogin: () => {
+        document.getElementById("login-view").classList.remove("hidden");
+        document.getElementById("app-view").classList.add("hidden");
+    }
+};
 
 // --- STATE & UTILS ---
 const state = {
@@ -273,6 +354,9 @@ const actions = {
 // --- INIT ---
 document.addEventListener("DOMContentLoaded", () => {
   lucide.createIcons();
+
+  // Initialize Auth
+  auth.init();
 
   // Check for previous session in storage to show visual cue (optional)
   if (localStorage.getItem("hb_last_room")) {

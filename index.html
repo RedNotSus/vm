@@ -12,6 +12,42 @@
 
 <body class="h-screen w-full flex flex-col">
 
+    <!-- Login View -->
+    <section id="login-view" class="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-zinc-950 p-6">
+        <div class="w-full max-w-sm flex flex-col gap-6">
+            <div class="text-center">
+                <h1 class="text-3xl font-bold text-white tracking-tight mb-2">Welcome Back</h1>
+                <p class="text-zinc-500 text-sm">Sign in to access your console</p>
+            </div>
+
+            <form onsubmit="auth.login(event)" class="flex flex-col gap-4">
+                <div class="space-y-1">
+                    <label for="username" class="text-xs font-medium text-zinc-400 uppercase tracking-wider">Username</label>
+                    <input type="text" id="username" name="username"
+                        class="w-full bg-zinc-900/50 border border-zinc-800 rounded-lg px-4 py-3 text-white placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500/50 transition-all"
+                        placeholder="Enter your username" required autocomplete="off">
+                </div>
+
+                <div class="space-y-1">
+                    <label for="password" class="text-xs font-medium text-zinc-400 uppercase tracking-wider">Password</label>
+                    <input type="password" id="password" name="password"
+                        class="w-full bg-zinc-900/50 border border-zinc-800 rounded-lg px-4 py-3 text-white placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500/50 transition-all"
+                        placeholder="••••••••" required>
+                </div>
+
+                <button type="submit" id="btn-login"
+                    class="mt-2 w-full bg-white text-black font-semibold py-3 rounded-lg hover:bg-zinc-200 transition-colors flex items-center justify-center gap-2">
+                    <span>Sign In</span>
+                    <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                </button>
+            </form>
+            <p id="login-error" class="text-red-500 text-sm text-center hidden"></p>
+        </div>
+    </section>
+
+    <!-- App View -->
+    <div id="app-view" class="flex flex-col h-full w-full hidden">
+
     <!-- Top Navigation Bar -->
     <nav class="h-16 bg-zinc-950/80 backdrop-blur-md flex items-center justify-center px-6 sticky top-0 z-40">
 
@@ -81,6 +117,8 @@
         <iframe id="vm-frame" class="w-full h-full border-none bg-zinc-950"
             allow="clipboard-read; clipboard-write; microphone; camera; fullscreen"></iframe>
     </div>
+
+    </div> <!-- End App View -->
 
     <!-- Toast Container -->
     <div id="toast-container" class="fixed bottom-6 right-6 z-[60] flex flex-col gap-2 pointer-events-none"></div>
